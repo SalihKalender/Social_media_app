@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    {{user.username}}
+{% endblock %}
+
+{% block content %}
+    <div class="w-2/3 p-5 mx-auto">
+        <div class="px-8 py-4 flex items-center justify-between">
+            <div class="profile_sec flex items-center">
+                <img src="{{profile_image.imageURL.url}}"
+                     alt="Profile Image"
+                     class="rounded-full w-24 h-24 object-cover mr-4 shadow-lg">
+                <div id="names">
+                    <p class="text-gray-50 text-2xl font-medium">{{user}}</p>
+                    {% if is_following %}
+                        <button id='no_following_btn' type="button" class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4'>Takibi bırak</button>
+                        <button id='following_btn' type="button" class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4 hidden'>Takip et</button>
+                    {% else %}
+                        <button id='following_btn' type="button" class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4'>Takip et</button>
+                        <button id='no_following_btn' type="button" class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4 hidden'>Takibi bırak</button>
+
+                    {% endif %}
+                
+                </div>
+            </div>
+            <div class="follower_sec flex">
+                <a href="{% url 'AnotherUser Followers' user_name=user.username%}">
+                    <p class="text-white text-lg mr-4"><span class="font-semibold" id='followers_count'> {{followers_count}} </span> Followers</p>
+                </a>
+                <a href="{% url 'AnotherUser Followings' user_name=user.username%}">
+                    <p class="text-white text-lg"><span class="font-semibold"> {{ following_count }} </span> Following</p>
+                </a>
+            </div>
+        </div>
+        <div class="alt_cizgi w-full h-px text bg-gray-400 px-20"></div>
+        
+        <div class="flex flex-wrap mt-10">
+            {% for post in posts %}
+                <a class="p-5 bg-gray-300 rounded-xl shadow-lg m-2" href="{% url 'Post Detail' post_id=post.id %}">
+                    <img src="{{post.imageURL.url}}"
+                        alt="Post Image"
+                        class="w-56 h-56 object-cover rounded-xl shadow-md">
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="begeni_kismi flex items-center">
+                            <i class="fa-solid fa-thumbs-up text-pink-500 text-lg"></i>
+                            <p class="ml-2 text-white font-semibold">150</p>
+                        </div>
+                        <p class="text-gray-500">11 April 2022</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts%}
+$(document).ready(function(){
+    const url = $(location).attr('href')
+    $('#following_btn').on('click', (e) => {
+        $.get(url + '/following', function(data, status){
+            $('#followers_count').html(data.context.count)
+            $('#following_btn').addClass('hidden')
+            $('#no_following_btn').removeClass('hidden')
+        });
+    })
+    $('#no_following_btn').on('click', (e) => {
+        $.get(url + '/no_following', function(data, status){
+            $('#followers_count').html(data.context.count)
+            $('#following_btn').removeClass('hidden')
+            $('#no_following_btn').addClass('hidden')
+        });
+    })
+});
+{% endblock %}

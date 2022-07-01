@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    User Search
+{% endblock %}
+
+{% block content %}
+    <div class='w-full flex flex-col mt-8'>
+        <input id='user_search' type='text' class='p-3 rounded-lg'>
+        <ul class='users_list flex flex-col'>
+            {% for user in users %}
+                <li class='item p-3 rounded-lg w-full bg-slate-100 mt-5 flex justify-around items-center'>
+                    <a href="{% url "AnotherUser" user_name=user.username %}" class='user_name text-pink-500'>{{user.username}}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block scripts%}
+$('#user_search').on('input', (e) => {
+    $(".user_name").each( function() {
+        if($(this).text().toLowerCase().includes(e.target.value.toLowerCase()) == false){
+            $(this).parent().hide()
+        }
+        else{
+            $(this).parent().show()
+        }
+    });
+})
+{% endblock %}

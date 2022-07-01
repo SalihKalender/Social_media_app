@@ -1,0 +1,45 @@
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% tailwind_css %}
+</head>
+<body class="bg-gray-500">
+<div class='w-3/4 mx-auto p-5 h-screen flex items-center'>
+    <form class="form w-2/3 rounded-xl bg-gray-200 p-5 mx-auto" method='POST'>
+        {% csrf_token %}
+        <div class='form_item'>
+            <h4 class='text-pink-500 text-2xl mb-2'>User Name</h4>
+            <input type='text' name='username' id='username' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0 text-white'/>
+        </div>
+        <div class='form_item mt-10'>
+            <h4 class='text-pink-500 text-2xl mb-2'>Password</h4>
+            <input type='password' name='password' id='password' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0'/>
+        </div>
+        <div class='form_item mt-10'>
+            <h4 class='text-pink-500 text-2xl mb-2'>Repassword</h4>
+            <input type='password' name='repassword' id='repassword' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0'/>
+        </div>
+        <div class='form_item mt-10'>
+            <h4 class='text-pink-500 text-2xl mb-2'>Email</h4>
+            <input type='email' name='email' id='email' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0'/>
+        </div>
+        <div class='form_item mt-10'>
+            <h4 class='text-pink-500 text-2xl mb-2'>Firstname</h4>
+            <input type='text' name='firstname' id='firstname' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0'/>
+        </div>
+        <div class='form_item mt-10'>
+            <h4 class='text-pink-500 text-2xl mb-2'>Lastname</h4>
+            <input type='text' name='lastname' id='lastname' class='p-4 bg-gray-300 rounded-lg border-0 hover:bg-gray-400 hover:border-0'/>
+        </div>
+        {% if error %}
+            <p class='text-red-500'> {{error}} </p>
+        {% endif %}
+        <button class='mt-12 rounded-xl bg-pink-500 text-white px-5 py-2'>Submit</button>
+    </form>
+</div>
+</body>
+</html>

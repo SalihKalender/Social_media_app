@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+{% block content %}
+    <div>
+        
+        {% for post in posts %}
+            <a href="{% url "Post Detail" post_id=post.id %}" class="flex flex-col items-center rounded-xl my-8">
+                <img src="{{post.imageURL.url}}" alt="Post Image"
+                    class="w-96 h-80 rounded-t-xl object-cover">
+                <div class="py-2.5 px-5 flex flex-row	justify-between bg-gray-100 shadow-lg w-96 items-center rounded-b-xl">
+                    <img src="{{post.profile_image.url}}"
+                        alt="Profile Image"
+                        class="object-cover w-6 h-6 rounded-xl shadow-lg">
+                    <p class="text-sm text-gray-500">Posted by <span class="text-pink-500 text-bold">{{ post.posted_user }}</span>
+                    </p>
+                </div>
+            </a>
+        {% endfor %}
+
+        
+        
+        
+    </div>
+{% endblock %}

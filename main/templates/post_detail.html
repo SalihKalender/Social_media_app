@@ -1,0 +1,137 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Post Detail
+{% endblock %}
+
+{% block content %}
+    <div class="w-2/3 p-5 rounded-xl bg-gray-200 mx-auto mt-10">
+        <div class="profile_post_info flex items-center justify-between px-5 w-full mb-5">
+            <div class="flex items-center p-3 bg-gray-400 rounded-xl">
+                <img src="{{profile_image_posted.imageURL.url}}" alt="profile-image" class="w-12 h-12 rounded-xl mr-2 object-cover">
+                <div class="flex flex-col h-full justify-between items-center">
+                    <p class="font-medium text-xl text-white">{{user.username}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="post_image w-full px-5 mb-5">
+            <img src="{{post.imageURL.url}}" alt="post image">
+        </div>
+        <div class="post_likes px-6 flex items-center">
+            <div class="likes hover:cursor-pointer" id='like_section'>
+                <i class="fa-solid fa-thumbs-up text-lg"></i><!-- text-pink-500-->
+                <span id='like_count' class="inline-block ml-1 text-base font-semibold"> {{ total_likes }} </span>
+            </div>
+            <a class='mr-6' href="{% url 'Post Like Users' post_id=post.id%}">Tümünü gör</a>
+            <div class="disLikes hover:cursor-pointer" id='disslike_section'>
+                <i class="fa-solid fa-thumbs-down text-gray-600 text-lg"></i>
+                <span id='disslike_count' class="inline-block ml-1 text-base font-semibold"> {{ total_disslikes }} </span>
+            </div>
+            <a href="{% url 'Post DissLike Users' post_id=post.id%}">Tümünü gör</a>
+        </div>
+        <div class="post_comments px-6 mt-6">
+            <p class="text-2xl font-bold">Comments</p>
+            <button id='comment_line' type="button" class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4'>Yorum Yap</button>
+            <div id='comments_container' class="comments_container mt-6">
+            {% for comment in comments %}
+                <div class="w-full flex bg-gray-300 p-3 rounded-xl my-6">
+                    <div class="profile_sec flex flex-col w-56 mr-4">
+                        <img src="{{comment.profile_image}}"
+                             class="rounded-full w-12 object-cover" alt="profile image">
+                        <p class="text-pink-500">{{comment.user_name}}</p>
+                    </div>
+                    <p class="text-black">{{comment.text}}</p>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+$(document).ready(function(){
+    const url = $(location).attr('href')
+    $('#like_section').on('click', () => {
+        $.get(url + '/like', function(data, status){
+            $('#like_count').html(data.context.total_likes + ' likes')
+            $('#disslike_count').html(data.context.total_disslikes + ' disslikes')
+            $('#like_count').addClass('text-pink-500')
+            $('#disslike_count').removeClass('text-pink-500')
+        });
+    })
+    $('#disslike_section').on('click', () => {
+        $.get(url + '/disslike', function(data, status){
+            $('#disslike_count').html(data.context.total_disslikes + ' disslikes')
+            $('#like_count').html(data.context.total_likes + ' likes')
+            $('#disslike_count').addClass('text-pink-500')
+            $('#like_count').removeClass('text-pink-500')
+        });
+    })
+
+    let comment_is_open = false;
+    $('#comment_line').on('click', () => {
+        if(comment_is_open) {
+            return
+        }
+        else {
+            comment_is_open = true;
+            $('#comments_container').append("<div id='opened_comment_sec' class='w-full flex bg-gray-300 p-3 rounded-xl my-6'><input type='text' class='text-black' style='width:40rem;'><button type='button' id='share_comment' class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4'>Paylas</button><button id='close_comment_sec' type='button' class='px-4 py-2 hover:drop-shadow-sm rounded-md bg-pink-700 hover:bg-pink-800 text-white mt-4'>x</button></div>")
+        }
+    })
+
+    $(document).on("click", "button#close_comment_sec" , function() {
+        comment_is_open = false;
+        $('#opened_comment_sec').remove()
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    
+    
+    $(document).on("click", "button#share_comment" , function() {
+        $.ajax({
+            url: url + '/comment',
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify({payload: $(this).prev().val(),}),
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+              "X-CSRFToken": getCookie("csrftoken"),  // don't forget to include the 'getCookie' function
+            },
+            success: (data) => {
+              const profile_image = data.context.profile_image
+              const name = data.context.name
+              const text = data.context.text
+              const new_element =  `
+              <div class="w-full flex bg-gray-300 p-3 rounded-xl my-6">
+                <div class="profile_sec flex flex-col w-56 mr-4">
+                    <img src=${profile_image}
+                         class="rounded-full w-12 object-cover" alt="profile image">
+                    <p class="text-pink-500">${name}</p>
+                </div>
+                <p class="text-black">${text}</p>
+              </div>
+              `
+              $('#comments_container').append(new_element)
+            },
+            error: (error) => {
+              console.log(error);
+            }
+          });
+    });
+
+});
+{% endblock %}
